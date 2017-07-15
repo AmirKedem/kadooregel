@@ -3,7 +3,7 @@
 
 A link to the live server will be provided shortly.
 
-### How to run server
+### How to run a server
 
 first install the kadooregel package from npm.
 then wirte this in your console(cmd):
