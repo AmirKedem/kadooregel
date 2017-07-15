@@ -306,7 +306,7 @@ function gameLoop() {
 						for (var i=0;i<players.length;i++) {
 							Matter.Body.setStatic(players[i].body,false);
 						}
-						sendCount = 'Go!!!'
+						sendCount = 'Go!'
 						io.sockets.emit('countdownStart', sendCount);
 						stopCountdownSent = false;
 						sendCount = 3;

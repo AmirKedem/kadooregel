@@ -1,13 +1,13 @@
 {
   "name": "kadooregel",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Networked soccer game with matter.js",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-		"kadooregel",
+    "kadooregel",
     "soccer",
     "game",
     "matter"
@@ -17,6 +17,7 @@
   "dependencies": {
     "express": "^4.15.3",
     "socket.io": "^2.0.2",
-		"matter-js": "^0.12.0"
-  }
+    "matter-js": "^0.12.0"
+  },
+  "reamde": "README.md"
 }
