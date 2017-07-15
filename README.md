@@ -3,11 +3,13 @@
 
 A link to the live server will be provided shortly.
 
-## How to run server
+### How to run server
 
+first install the kadooregel package from npm.
+then wirte this in your console(cmd):
 node server.js
 
-## How to play the game
+### How to play the game
 
 To connect to the game enter the URL of the live server.
 There is a limit of six players simultaniously. You will be assigned to a team randomly.
