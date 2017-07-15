@@ -5,10 +5,8 @@ A link to the live server will be provided shortly.
 
 ### How to run a server
 
-first install the kadooregel package from npm.
-
-then wirte this in your console(cmd):
-
+First install the kadooregel package from npm.
+Then wirte this in your console(cmd):
 node server.js
 
 ### How to play the game
