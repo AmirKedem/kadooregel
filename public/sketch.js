@@ -20,7 +20,6 @@ var right = 3;
 var left = 4;
 var blueTeamScore = 0;
 var redTeamScore = 0;
-//var score = blueTeamScore + ' : ' + redTeamScore;
 var score = blueTeamScore + ' - ' + redTeamScore;
 var countdownString;
 var clock;
