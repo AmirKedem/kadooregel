@@ -25,6 +25,7 @@ function preclock(time) {
 }
 
 //
+var isTextClear = false;
 var borders = [];
 var goalMode = false;
 var countdownMode = false;
@@ -109,6 +110,10 @@ function setup() {
 	
 	socket.on('update',
 		function(state) {
+			if (!isTextClear) {
+				document.getElementById('prematch').innerHTML = "";
+				isTextClear = true;
+			}
 		  preclock(state.clock);
 			ballpos = createVector(state.ballposx,state.ballposy);
 			ballsize = state.ballsize;

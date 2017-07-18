@@ -20,31 +20,9 @@ function listen() {
 	console.log("The amazing soccer server");
 }
 
-
 // need cookieParser middleware before we can do anything with cookies
 app.use(cookieParser());
-/*
 
-// set a cookie
-app.use(function (req, res, next) {
-  // check if client sent cookie
-  var cookie = req.cookies.cookieName;
-  if (cookie === undefined)
-  {
-    // no: set a new cookie
-    var randomNumber=Math.random().toString();
-    randomNumber=randomNumber.substring(2,randomNumber.length);
-    
-    console.log('cookie created successfully');
-  } 
-  else
-  {
-    // yes, cookie was already present 
-    console.log('cookie exists', cookie);
-  } 
-  next(); // <-- important!
-});
-*/
 app.use(function (req, res, next) {
 	res.cookie('Kport',app.get('port'), { maxAge: 900000, httpOnly: true });
 	next(); // <-- important!
@@ -58,6 +36,10 @@ var io = socket(server);
 function Player(team,Id) {
 	this.Id = Id;
 	this.team = team;
+	this.isStaticBol = true;
+	if (!countdownMode) {
+		this.isStaticBol = false;
+	}
 	this.w = 20;
 	this.h = 42;
 	this.posy = height/2;
@@ -68,10 +50,11 @@ function Player(team,Id) {
 		this.posx = width/2 + width/3;
 		this.heading = -Math.PI/2;
 	}
+	
 	this.options = {
 		mass: 5,
 		angle: this.heading,
-		isStatic: true,
+		isStatic: this.isStaticBol,
 		frictionAir: 0.05,
 		friction: 0.0001
 		
