@@ -257,7 +257,7 @@ var gameLoopRunning = false;
 var needRestart = false;
 // a stop watch for one sec.
 var onesecstopper = 0;
-var clock = 900;
+var clock = 300;
 var IntervalId;
 var players = [];
 var engine;
