@@ -21,3 +21,7 @@ The game will start once there are two players or more on the field.
 * left and right arrows - rotate left or right
 * shift - to drift while rotating
 * space - boost forward
+
+
+
+Thanks for your support.
