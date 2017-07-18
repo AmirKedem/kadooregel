@@ -33,7 +33,7 @@ function preload() {
 }*/
 //var dimension = [document.documentElement.clientWidth, document.documentElement.clientHeight];
 function setup() {
-	socket = io.connect('http://192.168.1.26:8080');
+	socket = io.connect('https://salty-escarpment-49001.herokuapp.com');
   //createCanvas(dimension[0], dimension[1]);
   createCanvas(innerWidth, innerHeight);
 	noLoop();

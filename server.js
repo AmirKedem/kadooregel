@@ -8,10 +8,14 @@ var Engine = Matter.Engine,
 
 var express = require('express');
 var app = express();
-var server = app.listen(8080,listen);
+
+app.set('port', (process.env.PORT || 5000));
+
+var server = app.listen(app.get('port'),listen);
 
 // This call back just tells us that the server has started
 function listen() {
+	console.log('Node app is running on port', app.get('port'));
 	console.log("The amazing soccer server");
 }
 
@@ -30,7 +34,7 @@ function Player(team,Id) {
 		this.posx = width/2 - width/3;
 		this.heading = Math.PI/2;
 	} else if (team == 'teamRed') {
-		this.posx = width/2 + width/3 
+		this.posx = width/2 + width/3;
 		this.heading = -Math.PI/2;
 	}
 	this.options = {
