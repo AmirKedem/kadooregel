@@ -7,6 +7,7 @@ var Engine = Matter.Engine,
 		Vector = Matter.Vector;
 
 var express = require('express');
+var cookieParser = require('cookie-parser');
 var app = express();
 
 app.set('port', (process.env.PORT || 5000));
@@ -19,6 +20,36 @@ function listen() {
 	console.log("The amazing soccer server");
 }
 
+
+// need cookieParser middleware before we can do anything with cookies
+app.use(cookieParser());
+/*
+
+// set a cookie
+app.use(function (req, res, next) {
+  // check if client sent cookie
+  var cookie = req.cookies.cookieName;
+  if (cookie === undefined)
+  {
+    // no: set a new cookie
+    var randomNumber=Math.random().toString();
+    randomNumber=randomNumber.substring(2,randomNumber.length);
+    
+    console.log('cookie created successfully');
+  } 
+  else
+  {
+    // yes, cookie was already present 
+    console.log('cookie exists', cookie);
+  } 
+  next(); // <-- important!
+});
+*/
+app.use(function (req, res, next) {
+	res.cookie('Kport',app.get('port'), { maxAge: 900000, httpOnly: true });
+	next(); // <-- important!
+});
+				
 app.use(express.static('public'));
 
 var socket = require('socket.io'); 

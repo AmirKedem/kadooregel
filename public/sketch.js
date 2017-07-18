@@ -1,3 +1,20 @@
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    for(var i = 0; i <ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
 function preclock(time) {
 	var timeconst = Math.floor(time/60)
 	if (time - 60 * timeconst < 10) {
@@ -6,6 +23,7 @@ function preclock(time) {
 		clock = timeconst + ':' + (time - 60 * timeconst);
 	}
 }
+
 //
 var borders = [];
 var goalMode = false;
@@ -31,11 +49,13 @@ var socket;
 function preload() {
 	backgroundImg = loadImage("football.jpg");
 }*/
-//var dimension = [document.documentElement.clientWidth, document.documentElement.clientHeight];
 function setup() {
-	socket = io.connect('http://salty-escarpment-49001.herokuapp.com:31047');
-	//socket = io.connect('http://localhost:5000');
-  //createCanvas(dimension[0], dimension[1]);
+	var Kport = getCookie('Kport');
+	if (Kport == '5000') {
+		socket = io.connect('http://localhost:5000');
+	} else {
+		socket = io.connect('https://salty-escarpment-49001.herokuapp.com:'+Kport);
+	}
   createCanvas(innerWidth, innerHeight);
 	noLoop();
 	textStyle(BOLD);
