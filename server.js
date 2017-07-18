@@ -168,11 +168,11 @@ function restart() {
 	resetPlayers(width/3,0,Math.PI/2);
 	resetBall();
 	countdown = 0;
+	sendCount = 3;
 	countdownMode = true;
 	blueTeamScore = 0;
   redTeamScore = 0;
-  blueTeamPlayers = 0;
-  redTeamPlayers = 0;
+	onesecstopper = 0;
 	clock = 300;
 	stopCountdownSent = false;
 	gameLoopRunning = false;
@@ -244,7 +244,7 @@ var rightDir = 1;
 var leftDir = -1;
 var countdown = 0;
 // this is the message that we send to our clients.
-var sendCount = fps;
+var sendCount = 3;
 var countdownTime = fps * 3;
 // asks whether we told our clients that the countdown is over.
 var stopCountdownSent = false;
