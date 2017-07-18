@@ -98,11 +98,11 @@ function Player(team,Id) {
 	}
 	this.move = function() {
 		if (this.isMoving) {
-			var vector = Vector.create(0,-0.001);
+			var vector = Vector.create(0,-0.0007);
 			this.body.force = Vector.rotate(vector, this.body.angle);
 		}
 		if (this.isBoosting) {
-			var vector = Vector.create(0,-0.002 );
+			var vector = Vector.create(0,-0.0027);
 			this.body.force = Vector.rotate(vector, this.body.angle);
 		}
 	}
@@ -142,7 +142,7 @@ function resetPlayers(xOffSet,yOffSet,angle) {
 	var BluePlayersPosVector = Vector.create(width/2-xOffSet, height/2-yOffSet);
 	var RedPlayersPosVector = Vector.create(width/2+xOffSet, height/2-yOffSet);
 	var BluePlayersAngle = angle;
-	var RedPlayersAngle = -angle;	
+	var RedPlayersAngle = -angle;
 	for (var i=0;i<players.length;i++) {
 		Matter.Body.setStatic(players[i].body,true);
 		if (players[i].team == 'teamBlue') {
@@ -152,7 +152,7 @@ function resetPlayers(xOffSet,yOffSet,angle) {
 			Matter.Body.setPosition(players[i].body,RedPlayersPosVector);
 			Matter.Body.setAngle(players[i].body, RedPlayersAngle);
 		}
-	}		
+	}
 }
 //
 function resetBall() {
@@ -160,6 +160,23 @@ function resetBall() {
 	var ballVelVector = Vector.create(0, 0);
 	Matter.Body.setPosition(ball.body,ballPosVector);
 	Matter.Body.setVelocity(ball.body, ballVelVector);
+}
+// restarts the game.
+function restart() {
+	goalStopWatch = 0;
+	goalMode = false;
+	resetPlayers(width/3,0,Math.PI/2);
+	resetBall();
+	countdown = 0;
+	countdownMode = true;
+	blueTeamScore = 0;
+  redTeamScore = 0;
+  blueTeamPlayers = 0;
+  redTeamPlayers = 0;
+	clock = 300;
+	stopCountdownSent = false;
+	gameLoopRunning = false;
+	gameLoop();
 }
 // Map message
 function worldMap() {
@@ -220,19 +237,18 @@ var blueTeamPlayers = 0;
 var redTeamPlayers = 0;
 var space = 0;
 var up = 1;
-var shift = 2
+var shift = 2;
 var rightKey = 3;
 var leftKey = 4;
 var rightDir = 1;
 var leftDir = -1;
-var countdownMode = true;
-// asks whether we told our clients that the countdown is over.
-var stopCountdownSent = false; 
 var countdown = 0;
 // this is the message that we send to our clients.
-var sendCount = 3;
-// how much time do we w8 for the countdown.
+var sendCount = 300;
 var countdownTime = fps * 3;
+// asks whether we told our clients that the countdown is over.
+var stopCountdownSent = false;
+var countdownMode = true;
 var goalMode = false;
 var goalStopWatch = 0;
 var goalStopWatchTime = fps * 5;
@@ -240,13 +256,13 @@ var startLoop = true;
 var gameLoopRunning = false;
 // a stop watch for one sec.
 var onesecstopper = 0;
-var clock = 300;
+var clock = 3;
 var IntervalId;
 var players = [];
 var engine;
 var width = 1600;
 var height = 900;
-// Creates the Engine
+// Creates the Engine.
 engine = Engine.create();
 engine.world.gravity.x = 0;
 engine.world.gravity.y = 0;
@@ -264,7 +280,7 @@ borders.push(// the left and right borders.
 						 new Border(width/2, -50, width*2, 200,0),
 						 // the right and left long borders.
 						 new Border(-130,height/2,bordersWidth,bordersHeight*4,-1),
-						 new Border(width+130,height/2,bordersWidth,bordersHeight*4,1));						
+						 new Border(width+130,height/2,bordersWidth,bordersHeight*4,1));
 // Ball. 
 ball = new Ball(width/2,height/2,50);
 // the game loop.
@@ -280,10 +296,14 @@ function gameLoop() {
 						stopCountdownSent = true;
 					}
 					if (!goalMode && !countdownMode) {
-						clock--;
 						if (clock <= 0) {
 							clearInterval(IntervalId);
 							gameLoopRunning = false; 
+							if (1==1) {
+								restart();
+							}
+						} else {
+							clock--;
 						}
 					}
 				}
@@ -291,7 +311,6 @@ function gameLoop() {
 					players[i].turn();
 					players[i].move();
 				}
-
 				if (goalMode) {
 					goalStopWatch++;
 					if (goalStopWatch>=goalStopWatchTime) {
@@ -310,15 +329,12 @@ function gameLoop() {
 						goalMode = true;
 					}
 				}
-
 				if (countdownMode) {
 					countdown++;
 					io.sockets.emit('countdownStart', sendCount);
 					if (countdown % fps == 0) {
 						sendCount--;
 						io.sockets.emit('countdownStart', sendCount);
-						// if you want the countdown to be without the one so put the line below plus remove the io sockets 3 lines above.
-						//sendCount--;
 					}
 					if(countdown >= countdownTime) {
 						for (var i=0;i<players.length;i++) {
@@ -332,7 +348,6 @@ function gameLoop() {
 						countdownMode = false;
 					}
 				}	
-
 				Engine.update(engine, 1000/fps);
 				io.sockets.emit('update', worldStatus());	
 			}, 
@@ -343,7 +358,6 @@ io.sockets.on('connection',
 // We are given a websocket object in our function
 function(socket) {
 	console.log('We have a new client: ' + socket.id);
-	
 	var team = 'teamBlue';
 	if (redTeamPlayers < blueTeamPlayers) {
 		team = "teamRed";
@@ -351,7 +365,6 @@ function(socket) {
 	} else {
 		blueTeamPlayers++;
 	}
-
 	if (redTeamPlayers + blueTeamPlayers <= 6) {
 		var player = new Player(team,socket.id);
 		players.push(player);

@@ -24,7 +24,6 @@ function preclock(time) {
 	}
 }
 
-//
 var isTextClear = false;
 var borders = [];
 var goalMode = false;
@@ -55,7 +54,7 @@ function setup() {
 	if (Kport == '5000') {
 		socket = io.connect('http://localhost:5000');
 	} else {
-		socket = io.connect('https://salty-escarpment-49001.herokuapp.com:'+Kport);
+		socket = io.connect('https://salty-escarpment-49001.herokuapp.com:' + Kport);
 	}
   createCanvas(innerWidth, innerHeight);
 	noLoop();
@@ -65,7 +64,6 @@ function setup() {
 			// gets the score state.
 			blueTeamScore = states[states.length-1][0];
 			redTeamScore = states[states.length-1][1];
-			//score = blueTeamScore + " : " + redTeamScore; 
 			score = blueTeamScore + " - " + redTeamScore; 
 			// gets the borders data.
 			for (var i=0; i<states.length;i++) {
