@@ -230,7 +230,7 @@ function getPlayer(Id) {
 	return null
 }
 //
-var fps = 20;
+var fps = 40;
 var blueTeamScore = 0;
 var redTeamScore = 0;
 var blueTeamPlayers = 0;
@@ -254,6 +254,7 @@ var goalStopWatch = 0;
 var goalStopWatchTime = fps * 5;
 var startLoop = true;
 var gameLoopRunning = false;
+var needRestart = false;
 // a stop watch for one sec.
 var onesecstopper = 0;
 var clock = 3;
@@ -299,9 +300,7 @@ function gameLoop() {
 						if (clock <= 0) {
 							clearInterval(IntervalId);
 							gameLoopRunning = false; 
-							if (1==1) {
-								restart();
-							}
+							needRestart = true;
 						} else {
 							clock--;
 						}
@@ -371,10 +370,14 @@ function(socket) {
 		// 
 		socket.emit('start', worldMap());
 		// check if we have enough players to start the game loop.
-		if (players.length >= 2 && !gameLoopRunning) {
-			gameLoop();
+		if (players.length >= 2) {
+			if (!gameLoopRunning) {
+				gameLoop();
+			} else if (needRestart) {
+				restart();
+				needRestart = false;
+			}
 		}
-		
 		socket.on('PressedEvents', function(key) {
 			player = getPlayer(socket.id)
 			if (player != null) {
