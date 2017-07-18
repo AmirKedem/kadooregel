@@ -230,7 +230,7 @@ function getPlayer(Id) {
 	return null
 }
 //
-var fps = 40;
+var fps = 30;
 var blueTeamScore = 0;
 var redTeamScore = 0;
 var blueTeamPlayers = 0;
@@ -244,7 +244,7 @@ var rightDir = 1;
 var leftDir = -1;
 var countdown = 0;
 // this is the message that we send to our clients.
-var sendCount = 300;
+var sendCount = fps;
 var countdownTime = fps * 3;
 // asks whether we told our clients that the countdown is over.
 var stopCountdownSent = false;
@@ -257,7 +257,7 @@ var gameLoopRunning = false;
 var needRestart = false;
 // a stop watch for one sec.
 var onesecstopper = 0;
-var clock = 3;
+var clock = 900;
 var IntervalId;
 var players = [];
 var engine;
