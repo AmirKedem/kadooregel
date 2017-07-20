@@ -44,6 +44,8 @@ var clock;
 var ballsize; 
 var ballpos;
 var socket;
+var XrenderScale = (innerWidth/1857);
+var YrenderScale = (innerHeight/990); 
 // background image setup.
 /*var backgroundImg;
 function preload() {
@@ -51,11 +53,14 @@ function preload() {
 }*/
 function setup() {
 	var Kport = getCookie('Kport');
+	socket = io.connect('https://salty-escarpment-49001.herokuapp.com:' + Kport);
+	/*
 	if (Kport == '5000') {
 		socket = io.connect('http://localhost:5000');
 	} else {
 		socket = io.connect('https://salty-escarpment-49001.herokuapp.com:' + Kport);
 	}
+	*/
   createCanvas(innerWidth, innerHeight);
 	noLoop();
 	textStyle(BOLD);
