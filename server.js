@@ -88,11 +88,11 @@ function Player(team,Id) {
 	}
 	this.move = function() {
 		if (this.isMoving) {
-			var vector = Vector.create(0,-0.0009);
+			var vector = Vector.create(0,-0.0014);
 			this.body.force = Vector.rotate(vector, this.body.angle);
 		}
 		if (this.isBoosting) {
-			var vector = Vector.create(0,-0.0027);
+			var vector = Vector.create(0,-0.0028);
 			this.body.force = Vector.rotate(vector, this.body.angle);
 		}
 	}
@@ -218,7 +218,7 @@ function getPlayer(Id) {
 	return null
 }
 //
-var fps = 30;
+var fps = 40;
 var blueTeamScore = 0;
 var redTeamScore = 0;
 var blueTeamPlayers = 0;
@@ -277,70 +277,68 @@ function gameLoop() {
 	gameLoopRunning = true;
 	IntervalId = setInterval(
 		function() {
-				onesecstopper++
-				if (onesecstopper % fps == 0) {
-					onesecstopper = 0;
-					if (!stopCountdownSent) {
-						io.sockets.emit('countdownStop');
-						stopCountdownSent = true;
-					}
-					if (!goalMode && !countdownMode) {
-						if (clock <= 0) {
-							clearInterval(IntervalId);
-							gameLoopRunning = false; 
-							needRestart = true;
-						} else {
-							clock--;
-						}
+			onesecstopper++
+			if (onesecstopper % fps == 0) {
+				onesecstopper = 0;
+				if (!stopCountdownSent) {
+					io.sockets.emit('countdownStop');
+					stopCountdownSent = true;
+				}
+				if (!goalMode && !countdownMode) {
+					if (clock <= 0) {
+						clearInterval(IntervalId);
+						gameLoopRunning = false; 
+						needRestart = true;
+					} else {
+						clock--;
 					}
 				}
-				for (var i=0;i<players.length;i++) {
-					players[i].turn();
-					players[i].move();
+			}
+			for (var i=0;i<players.length;i++) {
+				players[i].turn();
+				players[i].move();
+			}
+			if (goalMode) {
+				goalStopWatch++;
+				if (goalStopWatch>=goalStopWatchTime) {
+					goalStopWatch = 0;
+					goalMode = false;
+					resetObj(width/3,0,Math.PI/2);
+					io.sockets.emit('goalStop');
+					countdown = 0;
+					countdownMode = true;
 				}
-				if (goalMode) {
-					goalStopWatch++;
-					if (goalStopWatch>=goalStopWatchTime) {
-						goalStopWatch = 0;
-						goalMode = false;
-						resetObj(width/3,0,Math.PI/2);
-						io.sockets.emit('goalStop');
-						countdown = 0;
-						countdownMode = true;
-					}
-				} else {
-					var whoScore = whoScored();	
-					if (whoScore != null) {
-						io.sockets.emit('goalStart', (whoScore + ' Scored A Goal!!!'));
-						goalMode = true;
-					}
+			} else {
+				var whoScore = whoScored();	
+				if (whoScore != null) {
+					io.sockets.emit('goalStart', (whoScore + ' Scored A Goal!!!'));
+					goalMode = true;
 				}
-				if (countdownMode) {
-					countdown++;
+			}
+			if (countdownMode) {
+				countdown++;
+				io.sockets.emit('countdownStart', sendCount);
+				if (countdown % fps == 0) {
+					sendCount--;
 					io.sockets.emit('countdownStart', sendCount);
-					if (countdown % fps == 0) {
-						sendCount--;
-						io.sockets.emit('countdownStart', sendCount);
+				}
+				if(countdown >= countdownTime) {
+					for (var i=0;i<players.length;i++) {
+						Matter.Body.setStatic(players[i].body,false);
+						players[i].rot = 0;
 					}
-					if(countdown >= countdownTime) {
-						for (var i=0;i<players.length;i++) {
-							Matter.Body.setStatic(players[i].body,false);
-							players[i].rot = 0;
-						}
-						sendCount = 'Go!'
-						io.sockets.emit('countdownStart', sendCount);
-						stopCountdownSent = false;
-						sendCount = 3;
-						countdown = 0;
-						countdownMode = false;
-					}
-				}	
-				Engine.update(engine, 1000/fps);
-				io.sockets.emit('update', worldStatus());	
-			}, 
-		1000/fps);
+					sendCount = 'Go!'
+					io.sockets.emit('countdownStart', sendCount);
+					stopCountdownSent = false;
+					sendCount = 3;
+					countdown = 0;
+					countdownMode = false;
+				}
+			}	
+			Engine.update(engine, 1000/fps);
+			io.sockets.emit('update', worldStatus());	
+		},1000/fps);
 }
-
 io.sockets.on('connection',
 // We are given a websocket object in our function
 function(socket) {
@@ -360,6 +358,7 @@ function(socket) {
 		if (players.length >= 2) {
 			if (needRestart) {
 				restart();
+				socket.emit('start', worldMap());
 			} else if (!gameLoopRunning) {
 				gameLoop();
 			}
@@ -397,7 +396,6 @@ function(socket) {
 				} 
 			}
 		});
-
 		socket.on('ReleasedEvents', function(key) {
 			player = getPlayer(socket.id);
 			switch (key) {	
