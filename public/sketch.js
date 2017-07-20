@@ -53,14 +53,12 @@ function preload() {
 }*/
 function setup() {
 	var Kport = getCookie('Kport');
-	socket = io.connect('https://salty-escarpment-49001.herokuapp.com:' + Kport);
-	/*
+	//socket = io.connect('https://kadooregel.herokuapp.com:' + Kport);
 	if (Kport == '5000') {
 		socket = io.connect('http://localhost:5000');
 	} else {
-		socket = io.connect('https://salty-escarpment-49001.herokuapp.com:' + Kport);
+		socket = io.connect('https://kadooregel.herokuapp.com:' + Kport);
 	}
-	*/
   createCanvas(innerWidth, innerHeight);
 	noLoop();
 	textStyle(BOLD);
