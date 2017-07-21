@@ -39,13 +39,13 @@ var left = 4;
 var blueTeamScore = 0;
 var redTeamScore = 0;
 var score = blueTeamScore + ' - ' + redTeamScore;
+var winnerString = '';
+var restart = false;
 var countdownString;
 var clock;
 var ballsize; 
 var ballpos;
 var socket;
-var XrenderScale = (innerWidth/1857);
-var YrenderScale = (innerHeight/990); 
 // background image setup.
 /*var backgroundImg;
 function preload() {
@@ -53,17 +53,22 @@ function preload() {
 }*/
 function setup() {
 	var Kport = getCookie('Kport');
-	//socket = io.connect('https://kadooregel.herokuapp.com:' + Kport);
+	socket = io.connect('https://kadooregel.herokuapp.com:' + Kport);
+	//socket = io.connect('http://localhost:5000');
+	/*
 	if (Kport == '5000') {
 		socket = io.connect('http://localhost:5000');
 	} else {
 		socket = io.connect('https://kadooregel.herokuapp.com:' + Kport);
 	}
+	*/
   createCanvas(innerWidth, innerHeight);
 	noLoop();
 	textStyle(BOLD);
 	socket.on('start',
 		function(states) {
+			winnerString = '';
+			restart = true;
 			// gets the score state.
 			blueTeamScore = states[states.length-1][0];
 			redTeamScore = states[states.length-1][1];
@@ -77,7 +82,6 @@ function setup() {
 			translateX = (width - courtwidth)/2;
 			translateY = (height - courtheight)/2;
 		});
-	
 	socket.on('goalStart',
 		function(goalState) {
 			goalMode = true;
@@ -92,23 +96,23 @@ function setup() {
 				score = blueTeamScore + ' - ' + redTeamScore; 
 			}
 		});
-	
 	socket.on('goalStop',
 		function() {
 			goalMode = false;		
 		});
-	
 	socket.on('countdownStart',
 		function (countdownstr) {
 			countdownMode = true;
 			countdownString = countdownstr;	
 		});
-	
 	socket.on('countdownStop',
 		function () {
 			countdownMode = false;
 		});
-	
+	socket.on('endMatch',
+		function (winner) {
+			winnerString = winner;
+		});
 	socket.on('update',
 		function(state) {
 			if (!isTextClear) {
@@ -145,18 +149,23 @@ function draw() {
 		text('Blue Team',courtwidth/4,courtheight/20);
 		fill(255,0,0);
 		text('Red Team',courtwidth*3/4,courtheight/20);
-		if (goalMode) {
+		if (winnerString.length > 1 || restart) {
+			fill(0);
+			textSize(150);
+			textAlign(CENTER);
+			text(winnerString,courtwidth/2,courtheight/4);
+			restart = false;
+		} else if (countdownMode) {
+			fill(0);
+			textSize(150);
+			textAlign(CENTER);
+			text(countdownString,courtwidth/2,courtheight/4);
+		} else if (goalMode) {
 			fill(0);
 			textSize(90);
 			rectMode(CENTER);
 			textAlign(CENTER);
 			text(goalString, courtwidth/2, courtheight/2,1000,500);
-		}	
-		if (countdownMode) {
-			fill(0);
-			textSize(150);
-			textAlign(CENTER);
-			text(countdownString,courtwidth/2,courtheight/4);
 		}
 	}
 }

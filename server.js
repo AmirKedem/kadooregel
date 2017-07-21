@@ -64,6 +64,7 @@ function Player(team,Id) {
 	this.isBoosting = false;
 	this.leftKeyPressed = false;
 	this.rightKeyPressed = false;
+	this.lastKeyPressed = 0;
 	this.setRot = function(rot) {
 		if (this.isDrifting) {
 			this.rot = 0.26 * rot;
@@ -73,7 +74,7 @@ function Player(team,Id) {
 	}	
 	this.setLastRot = function(rot) {
 		if (this.isDrifting) {
-			this.rot = 0.02 * rot;
+			this.rot = 0.018 * rot;
 		} else {
 			this.rot = 0.005 * rot;
 		}
@@ -92,7 +93,7 @@ function Player(team,Id) {
 			this.body.force = Vector.rotate(vector, this.body.angle);
 		}
 		if (this.isBoosting) {
-			var vector = Vector.create(0,-0.0028);
+			var vector = Vector.create(0,-0.003);
 			this.body.force = Vector.rotate(vector, this.body.angle);
 		}
 	}
@@ -164,6 +165,7 @@ function restart() {
 	onesecstopper = 0;
 	clock = 300;
 	stopCountdownSent = false;
+	io.sockets.emit('start', worldMap());
 	gameLoop();
 }
 // Map message
@@ -287,7 +289,15 @@ function gameLoop() {
 				if (!goalMode && !countdownMode) {
 					if (clock <= 0) {
 						clearInterval(IntervalId);
-						gameLoopRunning = false; 
+						gameLoopRunning = false;
+						if (blueTeamScore > redTeamScore) {
+							var winner = 'Blue Team Wins'
+						} else if (blueTeamScore < redTeamScore) {
+							var winner = 'Red Team Wins'
+						} else {
+							var winner = 'Tie'
+						}
+						io.sockets.emit('endMatch',winner);
 						needRestart = true;
 					} else {
 						clock--;
@@ -358,7 +368,6 @@ function(socket) {
 		if (players.length >= 2) {
 			if (needRestart) {
 				restart();
-				socket.emit('start', worldMap());
 			} else if (!gameLoopRunning) {
 				gameLoop();
 			}
@@ -370,70 +379,78 @@ function(socket) {
 					case space:
 						player.isBoosting = true;
 						break;
-
 					case up:	
 						player.isMoving = true;
 						break;
-
 					case shift:
 						player.isDrifting = true;
-						if (player.rot > 0) {
+						if (player.rightKeyPressed) {
 							player.setRot(rightDir);
-						} else if(player.rot < 0) {
+						} else if(player.leftKeyPressed) {
 							player.setRot(leftDir);
 						}
 						break;
-						
 					case rightKey:
 						player.setRot(rightDir);	
-						player.rightKeyPressed = true;	
+						player.rightKeyPressed = true;
+						player.lastKeyPressed = rightDir;
 						break;
-
 					case leftKey:	
 						player.setRot(leftDir);
 						player.leftKeyPressed = true;	
+						player.lastKeyPressed = leftDir;
 						break;
 				} 
 			}
 		});
 		socket.on('ReleasedEvents', function(key) {
 			player = getPlayer(socket.id);
-			switch (key) {	
-				case space:
-					player.isBoosting = false;
-					break;
-
-				case up:	
-					player.isMoving = false;
-					break;
-					
-				case shift:
-					player.isDrifting = false;
-					if (player.rot > 0) {
-						player.setRot(rightDir);
-					} else if(player.rot < 0) {
-						player.setRot(leftDir);
-					}
-					break;
-					
-				case rightKey:	
-					if (player.leftKeyPressed) {
-						player.setRot(leftDir);
-					} else {
-						player.setLastRot(rightDir);
-					}
-					player.rightKeyPressed = false;	
-					break;
-
-				case leftKey:	
-					if (player.rightKeyPressed) {
-						player.setRot(rightDir);
-					} else {
-						player.setLastRot(leftDir);
-					}
-					player.leftKeyPressed = false;	
-					break;
-			} 
+			if (player != null) {
+				switch (key) {	
+					case space:
+						player.isBoosting = false;
+						break;
+					case up:	
+						player.isMoving = false;
+						break;
+					case shift:
+						player.isDrifting = false;
+						if (player.rightKeyPressed) {
+							player.setRot(rightDir);
+						} else if (player.leftKeyPressed) {
+							player.setRot(leftDir);
+						} else {
+							if (!player.lastKeyPressed == 0) {
+								player.setLastRot(player.lastKeyPressed)
+							} else {
+								player.setRot(0)
+							}
+						}
+						break;
+					case rightKey:	
+						if (player.leftKeyPressed) {
+							player.setRot(leftDir);
+						} else {
+							player.setLastRot(rightDir);
+						}
+						player.rightKeyPressed = false;	
+						if (player.leftKeyPressed) {
+							player.lastKeyPressed = leftDir;
+						}
+						break;
+					case leftKey:	
+						if (player.rightKeyPressed) {
+							player.setRot(rightDir);
+						} else {
+							player.setLastRot(leftDir);
+						}
+						player.leftKeyPressed = false;	
+						if (player.rightKeyPressed) {
+							player.lastKeyPressed = rightDir;
+						}
+						break;
+				} 
+			}
 		});
 		socket.on('disconnect', function() {
 			var player = getPlayer(socket.id);
