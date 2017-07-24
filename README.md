@@ -1,7 +1,7 @@
 # kadooregel
 2D multiplayer soccer game with node.js in the browser.
 
-A link to the live server will be provided shortly.
+https://kadooregel.herokuapp.com
 
 ### How to run a server
 
