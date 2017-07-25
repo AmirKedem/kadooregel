@@ -1,4 +1,6 @@
-
+//--- 25/7/2017
+//--- Written by Amir Kedem & Elad Shahar
+//---
 function getCookie(cname) {
     var name = cname + "=";
     var decodedCookie = decodeURIComponent(document.cookie);
@@ -14,7 +16,7 @@ function getCookie(cname) {
     }
     return "";
 }
-
+//
 function preclock(time) {
 	var timeconst = Math.floor(time/60)
 	if (time - 60 * timeconst < 10) {
@@ -23,7 +25,7 @@ function preclock(time) {
 		clock = timeconst + ':' + (time - 60 * timeconst);
 	}
 }
-
+//
 var isTextClear = false;
 var borders = [];
 var goalMode = false;
@@ -46,25 +48,24 @@ var clock;
 var ballsize; 
 var ballpos;
 var socket;
-// background image setup.
-/*var backgroundImg;
-function preload() {
-	backgroundImg = loadImage("football.jpg");
-}*/
+// Scaling The map to match all the screens (without keeping proportions).
+var Xscale = innerWidth/1857; 
+var Yscale = innerHeight/990;
+//
 function setup() {
 	var Kport = getCookie('Kport');
-	socket = io.connect('https://kadooregel.herokuapp.com:' + Kport);
+	//socket = io.connect('https://kadooregel.herokuapp.com:' + Kport);
 	//socket = io.connect('http://localhost:5000');
-	/*
 	if (Kport == '5000') {
 		socket = io.connect('http://localhost:5000');
 	} else {
 		socket = io.connect('https://kadooregel.herokuapp.com:' + Kport);
 	}
-	*/
+	//
   createCanvas(innerWidth, innerHeight);
-	noLoop();
 	textStyle(BOLD);
+	noLoop();
+	//
 	socket.on('start',
 		function(states) {
 			winnerString = '';
@@ -131,7 +132,8 @@ function draw() {
   // p5.js background fn
   //background(backgroundImg);
   background(255,255,255);
-	translate(translateX,translateY);
+	translate(translateX*Xscale,translateY*Yscale);
+	scale(Xscale,Yscale);
 	if (borders.length>0) {
 		renderBall();
 		for (var i=0;i<players.length;i++) {
@@ -168,6 +170,12 @@ function draw() {
 			text(goalString, courtwidth/2, courtheight/2,1000,500);
 		}
 	}
+}
+
+function windowResized() {
+	Xscale = innerWidth/1857; 
+  Yscale = innerHeight/990;
+  resizeCanvas(innerWidth, innerHeight);
 }
 
 function whichButtonDown(event) {

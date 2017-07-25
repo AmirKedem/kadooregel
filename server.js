@@ -74,26 +74,26 @@ function Player(team,Id) {
 	}	
 	this.setLastRot = function(rot) {
 		if (this.isDrifting) {
-			this.rot = 0.018 * rot;
+			this.rot = 0.02 * rot;
 		} else {
-			this.rot = 0.005 * rot;
+			this.rot = 0.007 * rot;
 		}
 	}	
 	this.turn = function() {
 		if (this.rot != 0) {
 			Body.setAngularVelocity(this.body, this.rot)
-			if (Math.abs(this.rot) < 0.01) {
+			if (Math.abs(this.rot) < 0.03) {
 				this.rot = 0;
 			}
 		}
 	}
 	this.move = function() {
 		if (this.isMoving) {
-			var vector = Vector.create(0,-0.0014);
+			var vector = Vector.create(0,-0.0018);
 			this.body.force = Vector.rotate(vector, this.body.angle);
 		}
 		if (this.isBoosting) {
-			var vector = Vector.create(0,-0.003);
+			var vector = Vector.create(0,-0.0032);
 			this.body.force = Vector.rotate(vector, this.body.angle);
 		}
 	}
