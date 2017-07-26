@@ -93,7 +93,7 @@ function Player(team,Id) {
 			this.body.force = Vector.rotate(vector, this.body.angle);
 		}
 		if (this.isBoosting) {
-			var vector = Vector.create(0,-0.0032);
+			var vector = Vector.create(0,-0.0034);
 			this.body.force = Vector.rotate(vector, this.body.angle);
 		}
 	}

@@ -49,18 +49,24 @@ var ballsize;
 var ballpos;
 var socket;
 // Scaling The map to match all the screens (without keeping proportions).
-var Xscale = innerWidth/1857; 
-var Yscale = innerHeight/990;
+var serverWidth = 1857;
+var serverHeight = 990;	
+// Scaling The map to match all the screens (without keeping proportions).
+var Xscale = innerWidth/serverWidth; 
+var Yscale = innerHeight/serverHeight;
 //
 function setup() {
+	// Server.
 	var Kport = getCookie('Kport');
-	//socket = io.connect('https://kadooregel.herokuapp.com:' + Kport);
+	socket = io.connect('https://kadooregel.herokuapp.com:' + Kport);
 	//socket = io.connect('http://localhost:5000');
+	/*
 	if (Kport == '5000') {
 		socket = io.connect('http://localhost:5000');
 	} else {
 		socket = io.connect('https://kadooregel.herokuapp.com:' + Kport);
 	}
+	*/
 	//
   createCanvas(innerWidth, innerHeight);
 	textStyle(BOLD);
@@ -80,8 +86,8 @@ function setup() {
 			}
 			courtwidth = Math.abs(borders[2].x) - Math.abs(borders[0].x);
 			courtheight = Math.abs(borders[4].y) - Math.abs(borders[5].y);
-			translateX = (width - courtwidth)/2;
-			translateY = (height - courtheight)/2;
+			translateX = (serverWidth - courtwidth)/2;
+			translateY = (serverHeight - courtheight)/2;
 		});
 	socket.on('goalStart',
 		function(goalState) {
@@ -173,8 +179,8 @@ function draw() {
 }
 
 function windowResized() {
-	Xscale = innerWidth/1857; 
-  Yscale = innerHeight/990;
+	Xscale = innerWidth/serverWidth; 
+  Yscale = innerHeight/serverHeight;
   resizeCanvas(innerWidth, innerHeight);
 }
 
