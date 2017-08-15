@@ -1,30 +1,23 @@
 function renderPlayers(index) {
 	this.team = players[index].team;
+	this.name = players[index].name;
+	this.textPosX = players[index].PosX;
+	this.textPosY = players[index].PosY;	
 	if (this.team == "teamBlue") {
-		this.col = {
-			red: 0,
-			green: 0,
-		  blue: 255
-		}
+		this.col = blueCol;
 	} else if (this.team == "teamRed") {
-		this.col = {
-			red: 255,
-			green: 0,
-		  blue: 0
-		}
-	} else {
-		this.col = {
-			red: 127,
-			green: 127,
-		  blue: 127
-		}
+		this.col = redCol;
 	}
 	push();
-	fill(this.col.red,this.col.green,this.col.blue);
+	fill(this.col);
 	beginShape();
 	for (var i=0;i<players[index].points.length;i++) {
 		vertex(players[index].points[i][0], players[index].points[i][1]);
 	}
 	endShape()
+	fill(0);
+	textSize(18);
+	textAlign(CENTER);
+	text(this.name, this.textPosX, this.textPosY+5);
 	pop();
 }

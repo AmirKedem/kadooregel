@@ -16,15 +16,24 @@
 	<link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-	<p id = "prematch">
-		please stand by and wait for more players to log in.</br></br></br></br></br>
-		How to play the game</br>
-		Controlls </br>
-		up arror - go forward</br>
-		left and right arrows - rotate left or right</br>
-		shift - to drift while rotating</br>
-		space - boost forward</br>
-	</p>
+	<div id="prematchScene">
+		<p>
+			please stand by and wait for more players to log in.
+		</p>
+		</br>
+		<div><span><input id="nameInput" placeholder="Nickname" value=""></span></div>
+		</br>
+		<button type="button" id="btnID" onclick="ready()">Start!</button>
+		</br>
+		<p>
+			How to play the game</br>
+			Controlls </br>
+			up arror - go forward</br>
+			left and right arrows - rotate left or right</br>
+			shift - to drift while rotating</br>
+			space - boost forward</br>
+		</p>
+	</div>
 <body onkeydown="whichButtonDown(event)">
 <body onkeyup="whichButtonUp(event)">
 </body>

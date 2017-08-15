@@ -1,22 +1,12 @@
 function renderBorder(border) {
-	this.side = {
-		red: 0,
-		blue: 0
-	}
-	
+	this.side = blackCol;
 	if (border.side == -1) {
-		this.side = {
-			red: 0,
-			blue: 255
-		}
+		this.side = blueCol;
 	} else if(border.side == 1) {
-		this.side = {
-			red: 255,
-			blue: 0
-		}
+		this.side = redCol;
 	}
 	noStroke();
-	fill(this.side.red,0,this.side.blue)
+	fill(this.side)
 	rectMode(CENTER);
 	rect(border.x,border.y,border.w,border.h);
 	rectMode(CORNER);

@@ -1,32 +1,9 @@
-//--- 25/7/2017
+//--- 13/8/2017
 //--- Written by Amir Kedem & Elad Shahar
 //---
-function getCookie(cname) {
-    var name = cname + "=";
-    var decodedCookie = decodeURIComponent(document.cookie);
-    var ca = decodedCookie.split(';');
-    for(var i = 0; i <ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) == ' ') {
-            c = c.substring(1);
-        }
-        if (c.indexOf(name) == 0) {
-            return c.substring(name.length, c.length);
-        }
-    }
-    return "";
-}
-//
-function preclock(time) {
-	var timeconst = Math.floor(time/60)
-	if (time - 60 * timeconst < 10) {
-		clock = timeconst + ':0' + (time - 60 * timeconst);
-	} else {
-		clock = timeconst + ':' + (time - 60 * timeconst);
-	}
-}
-//
-var isTextClear = false;
+var blackCol,
+		redCol,
+		blueCol;
 var borders = [];
 var goalMode = false;
 var countdownMode = false;
@@ -54,26 +31,70 @@ var serverHeight = 990;
 // Scaling The map to match all the screens (without keeping proportions).
 var Xscale = innerWidth/serverWidth; 
 var Yscale = innerHeight/serverHeight;
-//
+// States Of Connection.
+var connected = false;
+var readyBol = false;
+// Game Logic.
+function getCookie(cname) {
+    var name = cname + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    for(var i = 0; i <ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
+function preclock(time) {
+	var timeconst = Math.floor(time/60)
+	if (time - 60 * timeconst < 10) {
+		clock = timeconst + ':0' + (time - 60 * timeconst);
+	} else {
+		clock = timeconst + ':' + (time - 60 * timeconst);
+	}
+}
+
+function ready() {
+	var InputName = document.getElementById('nameInput').value
+	if (InputName.length > 0 && InputName.length < 19) {
+			if (!readyBol && connected) {
+				readyBol = true;
+				socket.emit('isReady',InputName);
+				document.getElementById('btnID').style.display = 'none';
+			}	
+	} else {
+		alert("please enter a name with more than 1 characters and less than 18");
+	}
+}
+
 function setup() {
 	// Server.
 	var Kport = getCookie('Kport');
 	socket = io.connect('https://kadooregel.herokuapp.com:' + Kport);
 	//socket = io.connect('http://localhost:5000');
-	/*
-	if (Kport == '5000') {
-		socket = io.connect('http://localhost:5000');
-	} else {
-		socket = io.connect('https://kadooregel.herokuapp.com:' + Kport);
-	}
-	*/
 	//
   createCanvas(innerWidth, innerHeight);
+	blackCol = color(0,0,0);
+	redCol = color(255,10,0);
+	blueCol = color(0,75,255);
 	textStyle(BOLD);
 	noLoop();
 	//
+	socket.on('connected',
+		function(totalPlayers){
+			if (totalPlayers >= 2) {
+				connected = true;
+			}
+		});
 	socket.on('start',
 		function(states) {
+			document.getElementById('prematchScene').style.display = 'none';
 			winnerString = '';
 			restart = true;
 			// gets the score state.
@@ -90,7 +111,7 @@ function setup() {
 			translateY = (serverHeight - courtheight)/2;
 		});
 	socket.on('goalStart',
-		function(goalState) {
+		function (goalState) {
 			goalMode = true;
 			goalString = goalState;
 			if (goalState.charAt(0) == 'B') {
@@ -104,7 +125,7 @@ function setup() {
 			}
 		});
 	socket.on('goalStop',
-		function() {
+		function () {
 			goalMode = false;		
 		});
 	socket.on('countdownStart',
@@ -121,41 +142,43 @@ function setup() {
 			winnerString = winner;
 		});
 	socket.on('update',
-		function(state) {
-			if (!isTextClear) {
-				document.getElementById('prematch').innerHTML = "";
-				isTextClear = true;
+		function (state) {
+			if (readyBol) {
+				preclock(state.clock);
+				ballpos = createVector(state.ballposx,state.ballposy);
+				ballsize = state.ballsize;
+				players = state.players;
+				redraw();
 			}
-		  preclock(state.clock);
-			ballpos = createVector(state.ballposx,state.ballposy);
-			ballsize = state.ballsize;
-			players = state.players;
-			redraw();
 		});				
 }
 
 function draw() {
-  // p5.js background fn
-  //background(backgroundImg);
-  background(255,255,255);
+	// p5.js background fn
+	//background(backgroundImg);
+	background(252,252,252);
 	translate(translateX*Xscale,translateY*Yscale);
 	scale(Xscale,Yscale);
 	if (borders.length>0) {
-		renderBall();
-		for (var i=0;i<players.length;i++) {
-			renderPlayers(i);
-		}
+		// borders
 		for(var i=0;i<borders.length;i++) {
 			renderBorder(borders[i]);
 		}
+		// ball 
+		renderBall();
+		// players
+		for (var i=0;i<players.length;i++) {
+			renderPlayers(i);
+		}
+		// texts
 		textAlign(CENTER);
 		textSize(90);
 		fill(255);
 		text(score,courtwidth/2,courtheight/20);
 		text(clock,courtwidth/2,courtheight+courtheight/50);
-		fill(0,0,255);
+		fill(blueCol);
 		text('Blue Team',courtwidth/4,courtheight/20);
-		fill(255,0,0);
+		fill(redCol);
 		text('Red Team',courtwidth*3/4,courtheight/20);
 		if (winnerString.length > 1 || restart) {
 			fill(0);
