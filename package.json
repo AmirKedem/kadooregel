@@ -1,6 +1,6 @@
 {
   "name": "kadooregel",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Networked soccer game with matter.js",
   "main": "server.js",
   "scripts": {
