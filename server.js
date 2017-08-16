@@ -136,6 +136,20 @@ function Border(x,y,w,h,side) {
 	this.body = Bodies.rectangle(x,y,w,h,this.options);
 	World.add(engine.world, this.body);
 }
+// 
+function pushBorders() {
+	borders.push(// the left and right borders.
+						 new Border(0,height/8,bordersWidth,bordersHeight,-1),
+						 new Border(0,height - height/8,bordersWidth,bordersHeight,-1),
+						 new Border(width,height/8,bordersWidth,bordersHeight,1),
+						 new Border(width,height - height/8,bordersWidth,bordersHeight,1),
+						 // the up & down borders.
+						 new Border(width/2, height+50, width*2, 200,0),
+						 new Border(width/2, -50, width*2, 200,0),
+						 // the right and left long borders.
+						 new Border(-135,height/2,bordersWidth-10,bordersHeight*4,-1),
+						 new Border(width+135,height/2,bordersWidth-10,bordersHeight*4,1));
+}
 // resets the Players and the Ball to their original location.
 function resetObj(xOffSet,yOffSet,angle) {
 	// Ball Reset
@@ -302,19 +316,10 @@ engine.world.gravity.x = 0;
 engine.world.gravity.y = 0;
 // Borders.
 var borders = [];
-var bordersWidth = width/13;
-var bordersHeight = height/2.6;
-borders.push(// the left and right borders.
-						 new Border(-10,height/8,bordersWidth,bordersHeight,-1),
-						 new Border(-10,height - height/8,bordersWidth,bordersHeight,-1),
-						 new Border(width+10,height/8,bordersWidth,bordersHeight,1),
-						 new Border(width+10,height - height/8,bordersWidth,bordersHeight,1),
-						 // the up & down borders.
-						 new Border(width/2, height+50, width*2, 200,0),
-						 new Border(width/2, -50, width*2, 200,0),
-						 // the right and left long borders.
-						 new Border(-130,height/2,bordersWidth,bordersHeight*4,-1),
-						 new Border(width+130,height/2,bordersWidth,bordersHeight*4,1));
+var bordersWidth = 140;
+var bordersHeight = 350;
+// Borders.
+pushBorders();
 // Ball. 
 ball = new Ball(width/2,height/2,50);
 // the game loop.

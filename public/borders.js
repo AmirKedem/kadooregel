@@ -9,5 +9,4 @@ function renderBorder(border) {
 	fill(this.side)
 	rectMode(CENTER);
 	rect(border.x,border.y,border.w,border.h);
-	rectMode(CORNER);
 }

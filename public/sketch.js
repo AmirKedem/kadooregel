@@ -8,29 +8,28 @@ var borders = [];
 var goalMode = false;
 var countdownMode = false;
 var courtwidth;
-var translateX;
-var translateY;		
-var space = 0;
-var up = 1;
-var shift = 2;
-var right = 3;
-var left = 4;
-var blueTeamScore = 0;
-var redTeamScore = 0;
+var translateX,
+		translateY;		
+var space = 0,
+		up = 1,
+		shift = 2,
+ 		right = 3,
+ 		left = 4;
+var blueTeamScore = 0,
+		redTeamScore = 0;
 var score = blueTeamScore + ' - ' + redTeamScore;
 var winnerString = '';
 var restart = false;
 var countdownString;
 var clock;
-var ballsize; 
-var ballpos;
-var socket;
-// Scaling The map to match all the screens (without keeping proportions).
-var serverWidth = 1857;
-var serverHeight = 990;	
-// Scaling The map to match all the screens (without keeping proportions).
-var Xscale = innerWidth/serverWidth; 
-var Yscale = innerHeight/serverHeight;
+var ballsize,
+		ballpos;
+var serverWidth = 1857,
+	  serverHeight = 990;
+var Xscale,
+		Yscale;
+var propWidth,
+		propHeight;
 // States Of Connection.
 var connected = false;
 var readyBol = false;
@@ -50,7 +49,7 @@ function getCookie(cname) {
     }
     return "";
 }
-
+//
 function preclock(time) {
 	var timeconst = Math.floor(time/60)
 	if (time - 60 * timeconst < 10) {
@@ -59,7 +58,7 @@ function preclock(time) {
 		clock = timeconst + ':' + (time - 60 * timeconst);
 	}
 }
-
+//
 function ready() {
 	var InputName = document.getElementById('nameInput').value
 	if (InputName.length > 0 && InputName.length < 19) {
@@ -72,7 +71,28 @@ function ready() {
 		alert("please enter a name with more than 1 characters and less than 18");
 	}
 }
-
+// Scaling The map to match all the screens (with keeping proportions).	
+function Proportions() {
+	// in order to keep proportions we must scale the X and the Y by the same value 
+	// but we also dont want the court to get out of the screen so we ask that question below.
+	Xscale = innerWidth/serverWidth; 
+	Yscale = innerHeight/serverHeight;
+	// -5 and -40 cuz the Borders probbly not align right therefor we need to fix it by hardcode 
+	// ---/borders overlapping/---
+	if (Xscale < Yscale) {
+		Yscale = Xscale;
+		// we need to translate to the center by the width
+		propWidth = 0;
+		propHeight = (innerHeight - courtheight * Yscale)/2 - (borders[4].h + borders[5].h - 40) / 8 * Yscale;
+	} else {
+		Xscale = Yscale;
+		// we need to translate to the center by the height
+		propWidth = (innerWidth - courtwidth * Xscale)/2 - ((borders[0].w + borders[6].w)/2 - 5) * Xscale;
+		propHeight = 0;
+	}
+}
+//
+var socket;
 function setup() {
 	// Server.
 	var Kport = getCookie('Kport');
@@ -105,10 +125,11 @@ function setup() {
 			for (var i=0; i<states.length;i++) {
 				borders.push(states[i]);
 			}
-			courtwidth = Math.abs(borders[2].x) - Math.abs(borders[0].x);
+			courtwidth = Math.abs(borders[7].x) - Math.abs(borders[6].x);
 			courtheight = Math.abs(borders[4].y) - Math.abs(borders[5].y);
-			translateX = (serverWidth - courtwidth)/2;
+		  translateX = (serverWidth - courtwidth)/2;
 			translateY = (serverHeight - courtheight)/2;
+			Proportions();
 		});
 	socket.on('goalStart',
 		function (goalState) {
@@ -157,7 +178,7 @@ function draw() {
 	// p5.js background fn
 	//background(backgroundImg);
 	background(252,252,252);
-	translate(translateX*Xscale,translateY*Yscale);
+	translate(translateX*Xscale + propWidth,translateY*Yscale + propHeight);
 	scale(Xscale,Yscale);
 	if (borders.length>0) {
 		// borders
@@ -202,8 +223,7 @@ function draw() {
 }
 
 function windowResized() {
-	Xscale = innerWidth/serverWidth; 
-  Yscale = innerHeight/serverHeight;
+	Proportions();
   resizeCanvas(innerWidth, innerHeight);
 }
 
