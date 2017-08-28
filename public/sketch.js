@@ -1,6 +1,7 @@
-//--- 13/8/2017
+//--- 20/8/2017
 //--- Written by Amir Kedem & Elad Shahar
 //---
+var socket;
 var blackCol,
 		redCol,
 		blueCol;
@@ -34,6 +35,37 @@ var propWidth,
 var connected = false;
 var readyBol = false;
 // Game Logic.
+// checks if the player connected and there is 2 players or more.
+//(being called by a button).
+// this is the list of the curse words.
+var words = ['fuck','shit','whore','ass','asshole','idiot','dumb','bitch'
+						,'pussy','cock','dick','fag','faggot','fagot','nigga','nigger'
+						,'damn','darn','piss','douche','slut','bastard','crap','cunt'];
+function checkName() {
+	var name = document.getElementById('nameInput').value.trim();
+	if (name.length > 0 && name.length < 19) {
+		for (var i=0;i < words.length;i++) {
+			var curse = words[i];
+			var reg = new RegExp(curse,'gi');
+			name = name.replace(reg,'*'.repeat(curse.length));
+		}
+		return name;
+	}
+	return null;
+}
+function ready() {
+	var InputName = checkName();
+	if (InputName != null) {
+			if (!readyBol && connected) {
+				readyBol = true;
+				socket.emit('isReady',InputName);
+				document.getElementById('btnID').style.display = 'none';
+			}	
+	} else {
+		alert("please enter a name with more than 1 characters and less than 18");
+	}
+}
+//
 function getCookie(cname) {
     var name = cname + "=";
     var decodedCookie = decodeURIComponent(document.cookie);
@@ -49,26 +81,13 @@ function getCookie(cname) {
     }
     return "";
 }
-//
+// transform seconds to digital clock digits.
 function preclock(time) {
 	var timeconst = Math.floor(time/60)
 	if (time - 60 * timeconst < 10) {
 		clock = timeconst + ':0' + (time - 60 * timeconst);
 	} else {
 		clock = timeconst + ':' + (time - 60 * timeconst);
-	}
-}
-//
-function ready() {
-	var InputName = document.getElementById('nameInput').value
-	if (InputName.length > 0 && InputName.length < 19) {
-			if (!readyBol && connected) {
-				readyBol = true;
-				socket.emit('isReady',InputName);
-				document.getElementById('btnID').style.display = 'none';
-			}	
-	} else {
-		alert("please enter a name with more than 1 characters and less than 18");
 	}
 }
 // Scaling The map to match all the screens (with keeping proportions).	
@@ -91,8 +110,7 @@ function Proportions() {
 		propHeight = 0;
 	}
 }
-//
-var socket;
+// the P5.js initialization.
 function setup() {
 	// Server.
 	var Kport = getCookie('Kport');
@@ -173,7 +191,7 @@ function setup() {
 			}
 		});				
 }
-
+// the P5.js Loop.
 function draw() {
 	// p5.js background fn
 	//background(backgroundImg);
@@ -221,12 +239,7 @@ function draw() {
 		}
 	}
 }
-
-function windowResized() {
-	Proportions();
-  resizeCanvas(innerWidth, innerHeight);
-}
-
+//
 function whichButtonDown(event) {
 	if (event.keyCode == 32) {
 	socket.emit('PressedEvents',space);		  
@@ -240,7 +253,6 @@ function whichButtonDown(event) {
 	socket.emit('PressedEvents',right);						 
 	}
 }
-
 function whichButtonUp(event) {
 	if (event.keyCode == 32) {
   	socket.emit('ReleasedEvents',space);	
@@ -253,4 +265,9 @@ function whichButtonUp(event) {
 	} else if (event.keyCode == 39) {
 	socket.emit('ReleasedEvents',right);						 
 	}
+}
+// this function is being called every time the window is resized.
+function windowResized() {
+	Proportions();
+  resizeCanvas(innerWidth, innerHeight);
 }

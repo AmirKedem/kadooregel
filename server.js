@@ -277,17 +277,17 @@ function removePlayer(ID){
 }
 //
 var fps = 40;
-var blueTeamScore = 0;
-var redTeamScore = 0;
-var blueTeamPlayers = 0;
-var redTeamPlayers = 0;
-var space = 0;
-var up = 1;
-var shift = 2;
-var rightKey = 3;
-var leftKey = 4;
-var rightDir = 1;
-var leftDir = -1;
+var blueTeamScore = 0,
+    redTeamScore = 0;
+var blueTeamPlayers = 0,
+    redTeamPlayers = 0;
+var space = 0,
+		up = 1,
+		shift = 2,
+		rightKey = 3,
+		leftKey = 4;
+var rightDir = 1,
+    leftDir = -1;
 var countdown = 0;
 // this is the message that we send to our clients.
 var sendCount = 3;
@@ -307,9 +307,9 @@ var clock = 300;
 var readyCount = 0;
 var IntervalId;
 var players = [];
-var engine;
 var width = 1600;
 var height = 900;
+var engine;
 // Creates the Engine.
 engine = Engine.create();
 engine.world.gravity.x = 0;
