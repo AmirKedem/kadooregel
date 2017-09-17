@@ -277,8 +277,8 @@ function removePlayer(ID){
 }
 // this is the list of the curse words.
 var words = ['fuck','shit','whore','ass','asshole','idiot','dumb','bitch','stupid'
-						,'pussy','cock','dick','gay','fag','faggot','fagot','nigga','nigger'
-						,'damn','darn','piss','douche','slut','bastard','crap','cunt'];
+	,'pussy','cock','dick','gay','fag','faggot','fagot','nigga','nigger'
+	,'damn','darn','piss','douche','slut','bastard','crap','cunt'];
 //
 var fps = 40;
 var blueTeamScore = 0,
