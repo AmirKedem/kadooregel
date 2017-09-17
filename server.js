@@ -275,6 +275,10 @@ function removePlayer(ID){
 		}
 	}
 }
+// this is the list of the curse words.
+var words = ['fuck','shit','whore','ass','asshole','idiot','dumb','bitch','stupid'
+						,'pussy','cock','dick','gay','fag','faggot','fagot','nigga','nigger'
+						,'damn','darn','piss','douche','slut','bastard','crap','cunt'];
 //
 var fps = 40;
 var blueTeamScore = 0,
@@ -307,8 +311,8 @@ var clock = 300;
 var readyCount = 0;
 var IntervalId;
 var players = [];
-var width = 1600;
-var height = 900;
+var width = 1600,
+		height = 900;
 var engine;
 // Creates the Engine.
 engine = Engine.create();
@@ -316,8 +320,8 @@ engine.world.gravity.x = 0;
 engine.world.gravity.y = 0;
 // Borders.
 var borders = [];
-var bordersWidth = 140;
-var bordersHeight = 350;
+var bordersWidth = 140,
+		bordersHeight = 350;
 // Borders.
 pushBorders();
 // Ball. 
@@ -415,7 +419,13 @@ function(socket) {
 		var totalPlayers = redTeamPlayers + blueTeamPlayers;
 		if (totalPlayers <= 6) {
 			var player = getPlayer(socket.id);
-			player.setTeam(team,name);
+			var clearName = name;
+			for (var i=0;i < words.length;i++) {
+				var curse = words[i];
+				var reg = new RegExp(curse,'gi');
+				clearName = clearName.replace(reg,'*'.repeat(curse.length));
+			}
+			player.setTeam(team,clearName);
 			socket.emit('start', worldMap());
 			// check if we have enough players to start the game loop.
 			if (numReadyPlayers() >= 2) {

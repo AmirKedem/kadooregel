@@ -37,30 +37,14 @@ var readyBol = false;
 // Game Logic.
 // checks if the player connected and there is 2 players or more.
 //(being called by a button).
-// this is the list of the curse words.
-var words = ['fuck','shit','whore','ass','asshole','idiot','dumb','bitch'
-						,'pussy','cock','dick','fag','faggot','fagot','nigga','nigger'
-						,'damn','darn','piss','douche','slut','bastard','crap','cunt'];
-function checkName() {
-	var name = document.getElementById('nameInput').value.trim();
-	if (name.length > 0 && name.length < 19) {
-		for (var i=0;i < words.length;i++) {
-			var curse = words[i];
-			var reg = new RegExp(curse,'gi');
-			name = name.replace(reg,'*'.repeat(curse.length));
-		}
-		return name;
-	}
-	return null;
-}
 function ready() {
-	var InputName = checkName();
-	if (InputName != null) {
-			if (!readyBol && connected) {
-				readyBol = true;
-				socket.emit('isReady',InputName);
-				document.getElementById('btnID').style.display = 'none';
-			}	
+	var InputName = document.getElementById('nameInput').value.trim();
+	if (InputName.length > 0 && InputName.length < 19) {
+		if (!readyBol && connected) {
+			readyBol = true;
+			socket.emit('isReady',InputName);
+			document.getElementById('btnID').style.display = 'none';
+		}	
 	} else {
 		alert("please enter a name with more than 1 characters and less than 18");
 	}
@@ -114,8 +98,8 @@ function Proportions() {
 function setup() {
 	// Server.
 	var Kport = getCookie('Kport');
-	socket = io.connect('https://kadooregel.herokuapp.com:' + Kport);
-	//socket = io.connect('http://localhost:5000');
+	//socket = io.connect('https://kadooregel.herokuapp.com:' + Kport);
+	socket = io.connect('http://localhost:5000');
 	//
   createCanvas(innerWidth, innerHeight);
 	blackCol = color(0,0,0);
@@ -201,7 +185,7 @@ function draw() {
 	if (borders.length>0) {
 		// borders
 		for(var i=0;i<borders.length;i++) {
-			renderBorder(borders[i]);
+			renderBorders(borders[i]);
 		}
 		// ball 
 		renderBall();
