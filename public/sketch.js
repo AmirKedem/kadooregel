@@ -190,9 +190,9 @@ function setup() {
 	// Server.
 	var Kport = getCookie('Kport');
 	// This for Deploy
-	//socket = io.connect('https://kadooregel.herokuapp.com:' + Kport);
+	socket = io.connect('https://kadooregel.herokuapp.com:' + Kport);
 	// This for Testing
-	socket = io.connect('http://localhost:5000');
+	// socket = io.connect('http://localhost:5000');
 	//
     createCanvas(innerWidth, innerHeight);
 	//
