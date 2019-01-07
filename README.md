@@ -5,7 +5,7 @@ https://kadooregel.herokuapp.com
 
 ### How to run a server
 
-First install the npm kadooregel package from npm site or throw console.
+First install the npm kadooregel package from npm site or through console.
 
 Then wirte this line in your console(for example: cmd):
 
