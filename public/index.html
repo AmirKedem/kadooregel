@@ -1,40 +1,63 @@
 <html>
-<head>
-  <meta charset="UTF-8">
-	<title>kadooregel</title>
-	<script language="javascript" 
-					type="text/javascript" 
-					src=" https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.2/socket.io.js">
-	</script>
-  <script language="javascript" type="text/javascript" src="libraries/p5.js"></script>
-  <script language="javascript" type="text/javascript" src="libraries/p5.dom.js"></script>
-  <script language="javascript" type="text/javascript" src="libraries/p5.sound.js"></script>
-  <script language="javascript" type="text/javascript" src="sketch.js"></script>
-  <script language="javascript" type="text/javascript" src="renderPlayers.js"></script>
-  <script language="javascript" type="text/javascript" src="renderBall.js"></script>
-  <script language="javascript" type="text/javascript" src="renderBorders.js"></script>
-	<link rel="stylesheet" type="text/css" href="style.css">
-</head>
-<body>
-	<div id="prematchScene">
-		<p>
-			please stand by and wait for more players to log in.
-		</p>
-		</br>
-		<div><span><input id="nameInput" placeholder="Nickname" value=""></span></div>
-		</br>
-		<button type="button" id="btnID" onclick="ready()">Start!</button>
-		</br>
-		<p>
-			How to play the game</br>
-			Controlls </br>
-			up arrow - go forward</br>
-			left and right arrows - rotate left or right</br>
-			shift - to drift while rotating</br>
-			space - boost forward</br>
-		</p>
-	</div>
-<body onkeydown="whichButtonDown(event)">
-<body onkeyup="whichButtonUp(event)">
-</body>
+	<head>
+		<meta charset="UTF-8">
+		<title>kadooregel</title>
+		<script language="javascript" 
+						type="text/javascript" 
+						src=" https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.2/socket.io.js">
+		</script>
+		<script language="javascript" type="text/javascript" src="libraries/p5.js"></script>
+		<script language="javascript" type="text/javascript" src="libraries/p5.dom.js"></script>
+		<script language="javascript" type="text/javascript" src="sketch.js"></script>
+		<script language="javascript" type="text/javascript" src="renderPlayers.js"></script>
+		<script language="javascript" type="text/javascript" src="renderBall.js"></script>
+		<script language="javascript" type="text/javascript" src="renderBorders.js"></script>
+		<link rel="stylesheet" type="text/css" href="style.css">
+	</head>
+	<body>
+		<div id="prematchScene">
+			<p>
+				match will start only when there is at least 2 players that pressed start</br>
+				please stand by and wait for more players to log in
+			</p>
+			</br>
+			<div><span><input id="nameInput" placeholder="Nickname" value=""></span>
+				</br></br>	
+				<button type="button" id="btnID" onclick="ready()">Start!</button>
+			</div>
+			</br>
+			<p>
+				How to play the game</br>
+				<u>Controlls</u></br>
+				up arrow - go forward</br>
+				left and right arrows - rotate left or right</br>
+				shift - to drift while rotating</br>
+				space - boost forward</br>
+			</p>
+</div>
+		<div id="fullscreenBtnDiv">
+			<img src="images/Fullscreen.jpg" id="SettingsBtn" onclick="toggleFullscreen()">
+		</div>
+
+		<div id="helpBtnDiv">
+			<img src="images/question-mark.jpg" id="SettingsBtn" onclick="OverlayOn()">
+		</div>
+		
+		<div id="OverlayDiv" onclick="OverlayOff()">
+			<div class=OverlayText>
+				<p style="font-size: 72px; font-size: 9vmin; ">
+					How to play the game<br>
+					<u>Controlls</u>
+				</p>
+				<p style="font-size: 50px; font-size: 6vmin;">
+					up arrow - go forward <br>
+					left and right arrows - rotate left or right<br>
+					shift - to drift while rotating<br>
+					space - boost forward<br><br><br><br>
+				</p>
+			</div>
+		</div>
+		<body onkeydown="whichButtonDown(event)">
+		<body onkeyup="whichButtonUp(event)">
+	</body>
 </html>

@@ -1,8 +1,11 @@
 {
   "name": "kadooregel",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Networked soccer game with matter.js",
   "main": "server.js",
+  "files": [
+    "gameobjs.js"
+  ],
   "scripts": {
     "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -16,10 +19,10 @@
   "author": "Amir Kedem and Elad Shahar",
   "license": "ISC",
   "dependencies": {
-    "cookie-parser": "^1.4.3",
-    "express": "^4.15.3",
-    "matter-js": "^0.12.0",
-    "socket.io": "^2.0.3"
+		"cookie-parser": "^1.4.3",
+		"express": "^4.15.3",      
+		"matter-js": "^0.12.0",    
+		"socket.io": "^2.0.3"
   },
   "reamde": "README.md"
 }

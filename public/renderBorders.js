@@ -5,8 +5,9 @@ function renderBorders(border) {
 	} else if(border.side == 1) {
 		this.side = redCol;
 	}
+	
 	noStroke();
 	fill(this.side)
 	rectMode(CENTER);
-	rect(border.x,border.y,border.w,border.h);
+	rect(border.x, border.y, border.w, border.h);
 }

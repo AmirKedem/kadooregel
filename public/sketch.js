@@ -1,55 +1,109 @@
-//--- 20/8/2017
+//--- Started in: 20/8/2017
+//--- This version is: 1.2.3 , 7/1/19
 //--- Written by Amir Kedem & Elad Shahar
 //---
+
 var socket;
 var blackCol,
-		redCol,
-		blueCol;
+	redCol,
+	blueCol;
 var borders = [];
+var restart = false;
 var goalMode = false;
 var countdownMode = false;
-var courtwidth;
-var translateX,
-		translateY;		
 var space = 0,
-		up = 1,
-		shift = 2,
- 		right = 3,
- 		left = 4;
+	up = 1,
+	shift = 2,
+	right = 3,
+	left = 4;
 var blueTeamScore = 0,
-		redTeamScore = 0;
+	redTeamScore = 0;
 var score = blueTeamScore + ' - ' + redTeamScore;
 var winnerString = '';
-var restart = false;
 var countdownString;
 var clock;
-var ballsize,
-		ballpos;
-var serverWidth = 1857,
-	  serverHeight = 990;
+var ballRad,
+	ballPos;
+// NEEED To link it by the world map function and set it correctly.
+var wholeCourtXs = [],
+	wholeCourtYs = [];
+var courtWidth,
+	courtHeight;
+var translateX,
+	translateY;		
 var Xscale,
-		Yscale;
-var propWidth,
-		propHeight;
+	Yscale;
 // States Of Connection.
 var connected = false;
 var readyBol = false;
+
 // Game Logic.
 // checks if the player connected and there is 2 players or more.
-//(being called by a button).
+// (being called by a button).
+function toggleFullscreen() {
+	let fs = fullscreen();
+    fullscreen(!fs);
+}
+
+function OverlayOn() {
+  document.getElementById("OverlayDiv").style.display = "block";
+	document.getElementById("helpBtnDiv").style.display = "none";
+}
+
+function OverlayOff() {
+	document.getElementById("OverlayDiv").style.display = "none";
+	document.getElementById("helpBtnDiv").style.display = "block";
+}
+
+function DisplayText(_wholeCourtXs, _wholeCourtYs) {
+	push();
+	// texts
+	let wcXs = (_wholeCourtXs[0] + _wholeCourtXs[1]);
+	let wcYs = (_wholeCourtYs[0] + _wholeCourtYs[1]);
+	
+	fill(255);
+	textSize(70);
+	textAlign(CENTER, TOP);
+	text(clock, wcXs/2, _wholeCourtYs[1]);
+
+	textAlign(CENTER, BOTTOM);
+	text(score, wcXs/2, _wholeCourtYs[0]);
+	
+	fill(blueCol);
+	text('Blue Team', wcXs * 1/4, _wholeCourtYs[0]);
+	fill(redCol);
+	text('Red Team' , wcXs * 3/4, _wholeCourtYs[0]);	
+	
+	fill(0);
+	textAlign(CENTER, CENTER);
+	if (winnerString.length > 1 || restart) {
+		restart = false;
+		textSize(150);
+		text(winnerString    , wcXs/2, wcYs/4);
+	} else if (countdownMode) {
+		textSize(150);
+		text(countdownString , wcXs/2, wcYs/4);
+	} else if (goalMode) {
+		textSize(90);
+		text(goalString      , wcXs/2, wcYs/3, 1000, 500);
+	}
+	pop();
+}
+
 function ready() {
-	var InputName = document.getElementById('nameInput').value.trim();
+	let InputName = document.getElementById('nameInput').value.trim();
 	if (InputName.length > 0 && InputName.length < 19) {
 		if (!readyBol && connected) {
 			readyBol = true;
 			socket.emit('isReady',InputName);
+			document.body.style.overflow = "hidden";
 			document.getElementById('btnID').style.display = 'none';
 		}	
 	} else {
 		alert("please enter a name with more than 1 characters and less than 18");
 	}
 }
-//
+
 function getCookie(cname) {
     var name = cname + "=";
     var decodedCookie = decodeURIComponent(document.cookie);
@@ -65,43 +119,83 @@ function getCookie(cname) {
     }
     return "";
 }
-// transform seconds to digital clock digits.
+
 function preclock(time) {
-	var timeconst = Math.floor(time/60)
-	if (time - 60 * timeconst < 10) {
-		clock = timeconst + ':0' + (time - 60 * timeconst);
-	} else {
-		clock = timeconst + ':' + (time - 60 * timeconst);
-	}
+	// transform seconds to digital clock digits.
+	seconds = time % 60;
+	minutes = (time - time % 60)/60;
+	
+	seconds = seconds < 10 ? '0' + seconds : seconds;
+	minutes = minutes < 10 ? '0' + minutes : minutes;
+	
+	return (minutes + ':' + seconds);
 }
-// Scaling The map to match all the screens (with keeping proportions).	
-function Proportions() {
-	// in order to keep proportions we must scale the X and the Y by the same value 
-	// but we also dont want the court to get out of the screen so we ask that question below.
-	Xscale = innerWidth/serverWidth; 
-	Yscale = innerHeight/serverHeight;
-	// -5 and -40 cuz the Borders probbly not align right therefor we need to fix it by hardcode 
-	// ---/borders overlapping/---
+
+function Proportions(_borders) {
+	// Scaling The map to match all the screens (with keeping proportions).	
+	
+	// This function keeps the proportions of the server and display it for 
+	// the client We scale the court by the minimum dimension and scale both 
+	// dimensions by that ratio to keep the proportions of the server court.
+	
+	// courtXs the leftest x , rightsest x
+	// courtYs the upper y , lower y
+	wholeCourtXs = [_borders[4].x + _borders[4].w/2, _borders[5].x - _borders[5].w/2]
+	wholeCourtYs = [_borders[4].y + _borders[4].h/2, _borders[5].y - _borders[5].h/2]
+	
+	courtWidth = (_borders[7].x) - (_borders[6].x);
+	courtHeight = (_borders[5].y) - (_borders[4].y);
+	
+	Xscale = innerWidth / courtWidth;
+	Yscale = innerHeight / courtHeight;
+	
+	// We check which dimension is smaller and scale both 
+	// dimensions by that ratio to keep the proportions
 	if (Xscale < Yscale) {
+		// In order to keep proportions we must scale the X and the Y by the same value 
 		Yscale = Xscale;
-		// we need to translate to the center by the width
-		propWidth = 0;
-		propHeight = (innerHeight - courtheight * Yscale)/2 - (borders[4].h + borders[5].h - 40) / 8 * Yscale;
+		
+		// Since these borders are negative its important to translate them back to the screen
+		translateX = -_borders[6].x * Yscale;
+	  translateY = -_borders[4].y * Yscale;
+		
+		// -*translate the scaled court back to the middle of the screen*-
+		// We take the middle of the court and the middle of the screen and 
+		// traslate the middle of the court to the middle of the client's screen
+		let middleCourtPointY = translateY + _borders[6].y * Yscale;
+		let middleScreenPointY = innerHeight / 2;
+		
+		translateY += (middleScreenPointY - middleCourtPointY);
 	} else {
+		// In order to keep proportions we must scale the X and the Y by the same value 
 		Xscale = Yscale;
-		// we need to translate to the center by the height
-		propWidth = (innerWidth - courtwidth * Xscale)/2 - ((borders[0].w + borders[6].w)/2 - 5) * Xscale;
-		propHeight = 0;
+		
+		// Since these borders are negative its important to translate them back to the screen
+		translateX = -_borders[6].x * Xscale;
+		translateY = -_borders[4].y * Xscale;
+		
+		// -*translate the scaled court back to the middle of the screen*-
+		// We take the middle of the court and the middle of the screen and 
+		// traslate the middle of the court to the middle of the client's screen
+		let middleCourtPointX = translateX + _borders[4].x * Xscale;
+		let middleScreenPointX = innerWidth / 2;
+		
+		translateX += (middleScreenPointX - middleCourtPointX);
 	}
 }
+// End of the functions.
+
 // the P5.js initialization.
 function setup() {
 	// Server.
 	var Kport = getCookie('Kport');
-	socket = io.connect('https://kadooregel.herokuapp.com:' + Kport);
-	//socket = io.connect('http://localhost:5000');
+	// This for Deploy
+	//socket = io.connect('https://kadooregel.herokuapp.com:' + Kport);
+	// This for Testing
+	socket = io.connect('http://localhost:5000');
 	//
-  createCanvas(innerWidth, innerHeight);
+    createCanvas(innerWidth, innerHeight);
+	//
 	blackCol = color(0,0,0);
 	redCol = color(255,10,0);
 	blueCol = color(0,75,255);
@@ -116,7 +210,12 @@ function setup() {
 		});
 	socket.on('start',
 		function(states) {
+			// Take the starting div off
 			document.getElementById('prematchScene').style.display = 'none';
+			// make the make the settings buttons visible
+		  	document.getElementById('fullscreenBtnDiv').style.display = 'block';
+			document.getElementById('helpBtnDiv').style.display = 'block';
+			//
 			winnerString = '';
 			restart = true;
 			// gets the score state.
@@ -124,14 +223,12 @@ function setup() {
 			redTeamScore = states[states.length-1][1];
 			score = blueTeamScore + " - " + redTeamScore; 
 			// gets the borders data.
-			for (var i=0; i<states.length;i++) {
+			for (let i = 0; i < states.length; i++) {
 				borders.push(states[i]);
 			}
-			courtwidth = Math.abs(borders[7].x) - Math.abs(borders[6].x);
-			courtheight = Math.abs(borders[4].y) - Math.abs(borders[5].y);
-		  translateX = (serverWidth - courtwidth)/2;
-			translateY = (serverHeight - courtheight)/2;
-			Proportions();
+			
+			Proportions(borders);
+			ballRad = states[states.length - 2];
 		});
 	socket.on('goalStart',
 		function (goalState) {
@@ -167,63 +264,44 @@ function setup() {
 	socket.on('update',
 		function (state) {
 			if (readyBol) {
-				preclock(state.clock);
-				ballpos = createVector(state.ballposx,state.ballposy);
-				ballsize = state.ballsize;
+				clock = preclock(state.clock);
+				ballPos = createVector(state.ballposx,state.ballposy);
 				players = state.players;
 				redraw();
 			}
 		});				
 }
+
 // the P5.js Loop.
 function draw() {
 	// p5.js background fn
 	//background(backgroundImg);
 	background(252,252,252);
-	translate(translateX*Xscale + propWidth,translateY*Yscale + propHeight);
-	scale(Xscale,Yscale);
-	if (borders.length>0) {
+	// If i have a map so i have what to render 
+	// Or in other words the game has started.
+	if (borders.length > 0) {
+		// Scalling for all platforms and screens
+		translate(translateX, translateY);
+		scale(Xscale, Yscale);
+		
+		// ball 
+		renderBall(ballPos, ballRad, (wholeCourtXs[0] + wholeCourtXs[1]));
+		
 		// borders
-		for(var i=0;i<borders.length;i++) {
+		for (let i = 0; i < borders.length; i++) {
 			renderBorders(borders[i]);
 		}
-		// ball 
-		renderBall();
+
 		// players
-		for (var i=0;i<players.length;i++) {
+		for (let i = 0; i < players.length; i++) {
 			renderPlayers(i);
 		}
+		
 		// texts
-		textAlign(CENTER);
-		textSize(90);
-		fill(255);
-		text(score,courtwidth/2,courtheight/20);
-		text(clock,courtwidth/2,courtheight+courtheight/50);
-		fill(blueCol);
-		text('Blue Team',courtwidth/4,courtheight/20);
-		fill(redCol);
-		text('Red Team',courtwidth*3/4,courtheight/20);
-		if (winnerString.length > 1 || restart) {
-			fill(0);
-			textSize(150);
-			textAlign(CENTER);
-			text(winnerString,courtwidth/2,courtheight/4);
-			restart = false;
-		} else if (countdownMode) {
-			fill(0);
-			textSize(150);
-			textAlign(CENTER);
-			text(countdownString,courtwidth/2,courtheight/4);
-		} else if (goalMode) {
-			fill(0);
-			textSize(90);
-			rectMode(CENTER);
-			textAlign(CENTER);
-			text(goalString, courtwidth/2, courtheight/2,1000,500);
-		}
+		DisplayText(wholeCourtXs, wholeCourtYs);
 	}
 }
-//
+// INput
 function whichButtonDown(event) {
 	if (event.keyCode == 32) {
 	socket.emit('PressedEvents',space);		  
@@ -237,6 +315,7 @@ function whichButtonDown(event) {
 	socket.emit('PressedEvents',right);						 
 	}
 }
+
 function whichButtonUp(event) {
 	if (event.keyCode == 32) {
   	socket.emit('ReleasedEvents',space);	
@@ -252,6 +331,6 @@ function whichButtonUp(event) {
 }
 // this function is being called every time the window is resized.
 function windowResized() {
-	Proportions();
+	Proportions(borders);
   resizeCanvas(innerWidth, innerHeight);
 }
