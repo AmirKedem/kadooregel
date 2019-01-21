@@ -41,12 +41,12 @@ var readyBol = false;
 // checks if the player connected and there is 2 players or more.
 // (being called by a button).
 function toggleFullscreen() {
-	let fs = fullscreen();
-    fullscreen(!fs);
+        let fs = fullscreen();
+        fullscreen(!fs);
 }
 
 function OverlayOn() {
-  document.getElementById("OverlayDiv").style.display = "block";
+ 	document.getElementById("OverlayDiv").style.display = "block";
 	document.getElementById("helpBtnDiv").style.display = "none";
 }
 
@@ -190,11 +190,10 @@ function setup() {
 	// Server.
 	var Kport = getCookie('Kport');
 	// This for Deploy
-	socket = io.connect('https://kadooregel.herokuapp.com:' + Kport);
+	socket = io.connect('https://kadooregel-eu.herokuapp.com:' + Kport);
 	// This for Testing
 	// socket = io.connect('http://localhost:5000');
-	//
-    createCanvas(innerWidth, innerHeight);
+    	createCanvas(innerWidth, innerHeight);
 	//
 	blackCol = color(0,0,0);
 	redCol = color(255,10,0);
@@ -331,6 +330,6 @@ function whichButtonUp(event) {
 }
 // this function is being called every time the window is resized.
 function windowResized() {
+	resizeCanvas(innerWidth, innerHeight);
 	Proportions(borders);
-  resizeCanvas(innerWidth, innerHeight);
 }
