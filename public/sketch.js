@@ -41,8 +41,8 @@ var readyBol = false;
 // checks if the player connected and there is 2 players or more.
 // (being called by a button).
 function toggleFullscreen() {
-        let fs = fullscreen();
-        fullscreen(!fs);
+	let fs = fullscreen();
+	fullscreen(!fs);
 }
 
 function OverlayOn() {
@@ -303,29 +303,29 @@ function draw() {
 // INput
 function whichButtonDown(event) {
 	if (event.keyCode == 32) {
-	socket.emit('PressedEvents',space);		  
-  } else if (event.keyCode == 38) {
-	socket.emit('PressedEvents',up);						 
+		socket.emit('PressedEvents',space);		  
+    } else if (event.keyCode == 38) {
+		socket.emit('PressedEvents',up);						 
 	} else if (event.keyCode == 16) {
-	socket.emit('PressedEvents',shift);					 
+		socket.emit('PressedEvents',shift);					 
 	} else if (event.keyCode == 37) {
-	socket.emit('PressedEvents',left);		
+		socket.emit('PressedEvents',left);		
 	} else if (event.keyCode == 39) {
-	socket.emit('PressedEvents',right);						 
+		socket.emit('PressedEvents',right);						 
 	}
 }
 
 function whichButtonUp(event) {
 	if (event.keyCode == 32) {
-  	socket.emit('ReleasedEvents',space);	
-  } else if (event.keyCode == 38) {
-	socket.emit('ReleasedEvents',up);
+  		socket.emit('ReleasedEvents',space);	
+  	} else if (event.keyCode == 38) {
+		socket.emit('ReleasedEvents',up);
 	} else if (event.keyCode == 16) {
-	socket.emit('ReleasedEvents',shift);					 
+		socket.emit('ReleasedEvents',shift);					 
 	} else if (event.keyCode == 37) {
-	socket.emit('ReleasedEvents',left);		
+		socket.emit('ReleasedEvents',left);		
 	} else if (event.keyCode == 39) {
-	socket.emit('ReleasedEvents',right);						 
+		socket.emit('ReleasedEvents',right);						 
 	}
 }
 // this function is being called every time the window is resized.
