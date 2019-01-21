@@ -190,10 +190,10 @@ function setup() {
 	// Server.
 	var Kport = getCookie('Kport');
 	// This for Deploy
-	socket = io.connect('https://kadooregel-eu.herokuapp.com:' + Kport);
+	socket = io.connect('https://kadooregel.herokuapp.com:' + Kport);
 	// This for Testing
 	// socket = io.connect('http://localhost:5000');
-    	createCanvas(innerWidth, innerHeight);
+    createCanvas(innerWidth, innerHeight);
 	//
 	blackCol = color(0,0,0);
 	redCol = color(255,10,0);
