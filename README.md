@@ -1,8 +1,6 @@
 # kadooregel
 2D multiplayer soccer game with node.js in the browser.
 
-https://kadooregel.herokuapp.com
-
 ### How to run a server
 
 First install the npm kadooregel package from npm site or through console.
@@ -25,7 +23,3 @@ The game will start once there are two players or more on the field.
 * left and right arrows - rotate left or right
 * shift - to drift while rotating
 * space - boost forward
-
-
-
-Thanks for your support.
